@@ -1,11 +1,11 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model ,InferSchemaType } from 'mongoose';
 
 const tagSchema = new Schema({
-    _id: Schema.Types.ObjectId,
-  name: String,
+  userId: { type: Schema.Types.ObjectId, required: true },
+  name: { type: String },
   // Other tag-related fields if needed
 });
 
-const Tag = model('Tag', tagSchema);
+type Tag = InferSchemaType<typeof tagSchema>;
 
-export default Tag;
+export default model<Tag>('Tag', tagSchema);

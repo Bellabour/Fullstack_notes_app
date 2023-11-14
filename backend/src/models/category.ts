@@ -1,11 +1,11 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model,InferSchemaType} from 'mongoose';
 
 const categorySchema = new Schema({
-    _id: Schema.Types.ObjectId,
-  name: String,
+  userId: { type: Schema.Types.ObjectId, required: true },
+  name: { type: String },
   // Other category-related fields if needed
 });
 
-const Category = model('Category', categorySchema);
+type Category = InferSchemaType<typeof categorySchema>;
 
-export default Category;
+export default model<Category>('Category', categorySchema);

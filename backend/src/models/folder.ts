@@ -1,11 +1,11 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model, InferSchemaType } from 'mongoose';
 
 const folderSchema = new Schema({
-    _id: Schema.Types.ObjectId,  
-  name: String,
+  userId: { type: Schema.Types.ObjectId, required: true },
+  name: { type: String },
   // Other folder-related fields if needed
 });
 
-const Folder = model('Folder', folderSchema);
+type Folder = InferSchemaType<typeof folderSchema>;
 
-export default Folder;
+export default model<Folder>('Folder', folderSchema);
