@@ -4,7 +4,7 @@ export interface Note {
     text?: string;
     folders?: string[];
     tags?: string[];
-    categories?: string[];
+    categories?: CategoryModel[];
     createdAt: string;
     updatedAt: string;
 }

@@ -86,17 +86,71 @@ export async function createNote(note: NoteInput): Promise<Note> {
 }
 
 export async function updateNote(noteId: string, note: NoteInput): Promise<Note> {
-    const response = await fetchData("/api/notes/" + noteId,
-        {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(note),
-        });
+    const response = await fetchData("/api/notes/" + noteId, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(note),
+    });
+    return response.json();
+}
+
+export async function updateNoteWithCategories(noteId: string, note: NoteInput, addCategories: string[], removeCategories: string[]): Promise<Note> {
+    const response = await fetchData(`/api/notes/${noteId}/updateWithCategories`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ...note, addCategories, removeCategories }),
+    });
     return response.json();
 }
 
 export async function deleteNote(noteId: string) {
     await fetchData("/api/notes/" + noteId, { method: "DELETE" });
 }
+
+export interface Category {
+    _id: string;
+    name: string;
+    // Add other category-related fields if needed
+  }
+  
+  export async function fetchCategories(): Promise<Category[]> {
+    const response = await fetchData("/api/category", { method: "GET" });
+    return response.json();
+  }
+  
+  export interface CategoryInput {
+    name: string;
+    // Add other category-related fields if needed
+  }
+  
+  export async function createCategory(category: CategoryInput): Promise<Category> {
+    const response = await fetchData("/api/category/create",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(category),
+      });
+    return response.json();
+  }
+  
+  export async function updateCategory(categoryId: string, category: CategoryInput): Promise<Category> {
+    const response = await fetchData("/api/category/" + categoryId,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(category),
+      });
+    return response.json();
+  }
+  
+  export async function deleteCategory(categoryId: string) {
+    await fetchData("/api/categories/" + categoryId, { method: "DELETE" });
+  }

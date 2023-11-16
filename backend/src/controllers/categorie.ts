@@ -3,6 +3,7 @@ import { RequestHandler } from "express";
 import createHttpError from "http-errors";
 import CategorieModel from "../models/category";
 import { assertIsDefined } from "../util/assertlsDefined";
+import NoteModel from "../models/note";
 import mongoose from "mongoose";
 
 interface CreateCategorieBody {
@@ -70,3 +71,75 @@ export const createCategorie: RequestHandler<unknown, unknown, CreateCategorieBo
         next(error);
     }
 };
+
+export const getCategoryWithNotes: RequestHandler = async (req, res, next) => {
+    const categoryId = req.params.categoryId;
+    const authenticatedUserId = req.session.userId;
+
+    try {
+        assertIsDefined(authenticatedUserId);
+
+        if (!mongoose.isValidObjectId(categoryId)) {
+            throw createHttpError(400, "Invalid category id");
+        }
+
+        const category = await CategorieModel.findById(categoryId).exec();
+
+        if (!category) {
+            throw createHttpError(404, "Category not found");
+        }
+
+        if (!category.userId.equals(authenticatedUserId)) {
+            throw createHttpError(401, "You cannot access this category");
+        }
+
+        // Retrieve notes associated with this category
+        const notes = await NoteModel.find({
+            userId: authenticatedUserId,
+            categories: category._id,
+        }).exec();
+
+        const categoryWithNotes = {
+            ...category.toObject(),
+            notes,
+        };
+
+        res.status(200).json(categoryWithNotes);
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const deleteCategory: RequestHandler = async (req, res, next) => {
+    const categoryId = req.params.categoryId;
+    const authenticatedUserId = req.session.userId;
+
+    try {
+        assertIsDefined(authenticatedUserId);
+
+        if (!mongoose.isValidObjectId(categoryId)) {
+            throw createHttpError(400, "Invalid category id");
+        }
+
+        const category = await CategorieModel.findById(categoryId).exec();
+
+        if (!category) {
+            throw createHttpError(404, "Category not found");
+        }
+
+        if (!category.userId.equals(authenticatedUserId)) {
+            throw createHttpError(401, "You cannot access this category");
+        }
+
+        // Delete the category and its associated notes
+        await Promise.all([
+            category.deleteOne(),
+            NoteModel.deleteMany({ categories: category._id }),
+        ]);
+
+        res.sendStatus(204);
+    } catch (error) {
+        next(error);
+    }
+};
+

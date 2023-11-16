@@ -5,6 +5,8 @@ import { Note as NoteModel } from "../models/note";
 import { formatDate } from "../utils/formatDate";
 import { MdDelete } from "react-icons/md";
 
+// ... (imports remain the same)
+
 interface NoteProps {
     note: NoteModel,
     onNoteClicked: (note: NoteModel) => void,
@@ -16,9 +18,7 @@ const Note = ({ note, onNoteClicked, onDeleteNoteClicked, className }: NoteProps
     const {
         title,
         text,
-        folders,
-        tags,
-        categories,
+        categories, // Add categories here
         createdAt,
         updatedAt
     } = note;
@@ -35,21 +35,31 @@ const Note = ({ note, onNoteClicked, onDeleteNoteClicked, className }: NoteProps
             className={`${styles.noteCard} ${className}`}
             onClick={() => onNoteClicked(note)}>
             <Card.Body className={styles.cardBody}>
-                <Card.Title className={styleUtils.flexCenter}>
-                    {title}
-                    <MdDelete
-                        className="text-muted ms-auto"
-                        onClick={(e) => {
-                            onDeleteNoteClicked(note);
-                            e.stopPropagation();
-                        }}
-                    />
-                </Card.Title>
+                <div className={styles.header}>
+                    <Card.Title className={styleUtils.flexCenter}>
+                        {title}
+                        <MdDelete
+                            className="text-muted ms-auto"
+                            onClick={(e) => {
+                                onDeleteNoteClicked(note);
+                                e.stopPropagation();
+                            }}
+                        />
+                    </Card.Title>
+                    {/* Display categories here */}
+                    {categories && categories.length > 0 && (
+                        <div className={styles.categorySection}>
+                            <strong>Categories:</strong>
+                            <ul>
+                                {categories.map((category) => (
+                                    <li key={category._id}>{category.name}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                </div>
                 <Card.Text className={styles.cardText}>
                     {text}
-                </Card.Text>
-                <Card.Text>
-                    {folders},{tags},{categories}
                 </Card.Text>
             </Card.Body>
             <Card.Footer className="text-muted">

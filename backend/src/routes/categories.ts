@@ -9,4 +9,8 @@ router.get("/", CategorieController.getCategories);
 
 router.get("/:categoryId", CategorieController.getCategory);
 
+router.get("/:categoryId/withNotes", CategorieController.getCategoryWithNotes);
+
+router.delete("/:categoryId", CategorieController.deleteCategory);
+
 export default router;
